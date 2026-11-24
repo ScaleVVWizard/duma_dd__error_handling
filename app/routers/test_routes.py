@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Request, HTTPException
 from app.exceptions import CustomExceptionA, CustomExceptionB
 
 router = APIRouter(prefix="/test", tags=["error tests"])
@@ -24,3 +24,7 @@ async def echo(data: dict):
     if "password" in data:
         raise CustomExceptionA("Test mask logging")
     return data
+
+@router.get("/http-error")
+async def trigger_http_error():
+    raise HTTPException(status_code=403, detail="Access denied (HTTPException)")

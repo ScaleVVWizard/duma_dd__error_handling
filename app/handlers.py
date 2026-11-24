@@ -1,4 +1,4 @@
-from fastapi import Request
+from fastapi import Request, HTTPException
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 from app.exceptions import CustomExceptionA, CustomExceptionB
@@ -61,4 +61,17 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
         status_code=422,
         content=problem.model_dump(),
         headers={"Content-Type": "application/problem+json"}
+    )
+
+async def http_exception_handler(request: Request, exc: HTTPException):
+    await log_error(request, exc, exc.status_code)
+    
+    return JSONResponse(
+        status_code=exc.status_code,
+        content=ErrorResponse(
+            status_code=exc.status_code,
+            error_type="HTTPException",
+            message=exc.detail if isinstance(exc.detail, str) else str(exc.detail),
+            details=None
+        ).model_dump()
     )
