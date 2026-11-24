@@ -1,6 +1,5 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Request
 from app.exceptions import CustomExceptionA, CustomExceptionB
-from fastapi import Request
 
 router = APIRouter(prefix="/test", tags=["error tests"])
 
@@ -25,4 +24,3 @@ async def echo(data: dict):
     if "password" in data:
         raise CustomExceptionA("Test mask logging")
     return data
-
