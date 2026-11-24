@@ -1,5 +1,4 @@
 import sys
-import re
 import json
 import uuid
 from loguru import logger
@@ -39,8 +38,10 @@ def mask_headers(headers: dict) -> dict:
     return masked
 
 def setup_logging():
+    # Удаляем стандартный обработчик
     logger.remove()
     
+    # Вывод в stdout с форматированием для разработки
     logger.add(
         sys.stdout,
         format="{time:YYYY-MM-DD HH:mm:ss.SSS} | {level: <8} | {name} - {message}",
@@ -48,16 +49,18 @@ def setup_logging():
         colorize=True
     )
     
+    # Вывод в файл с ротацией (каждый день ИЛИ при достижении 10 МБ, хранить 7 дней)
     logger.add(
         settings.log_file,
-        rotation="1 day",
-        retention="7 days",
-        compression="gz",
-        serialize=True,  
-        level="ERROR",
-        enqueue=True  
+        rotation="10 MB",       # <--- Ротация по размеру 10 МБ
+        retention="7 days",     # Хранить архивы 7 дней
+        compression="gz",       # Сжимать старые логи
+        serialize=True,         # JSON-формат
+        level="ERROR",          # Логируем только ошибки
+        enqueue=True            # Асинхронная запись
     )
 
+# Инициализируем логгер при импорте
 setup_logging()
 
 async def get_request_body(request: Request, max_bytes: int = 2048) -> str:
