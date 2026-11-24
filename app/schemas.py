@@ -1,5 +1,6 @@
 from pydantic import BaseModel, EmailStr, constr, conint, Field
 from typing import Any, Optional
+from typing import List
 
 class ErrorResponse(BaseModel):
     status_code: int
@@ -14,4 +15,15 @@ class UserCreate(BaseModel):
     password: constr(min_length=8, max_length=16)
     phone: Optional[str] = 'Unknown'
     
-    
+class ValidationErrorDetail(BaseModel):
+    field: str
+    message: str
+    code: str
+
+class ProblemDetails(BaseModel):
+    type: str = "https://example.com/problems/validation-error"
+    title: str = "Validation Error"
+    status: int = 422
+    detail: str = "The request body failed validation."
+    instance: str
+    errors: Optional[List[ValidationErrorDetail]] = None
