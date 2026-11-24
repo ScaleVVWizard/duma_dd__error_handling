@@ -1,5 +1,6 @@
 from fastapi import APIRouter
 from app.exceptions import CustomExceptionA, CustomExceptionB
+from fastapi import Request
 
 router = APIRouter(prefix="/test", tags=["error tests"])
 
@@ -14,3 +15,14 @@ async def trigger_b(item_id: int):
     if item_id > 100:
         raise CustomExceptionB(f"Item {item_id} not found")
     return {"message": f"Item {item_id} exists"}
+
+@router.get("/boom")
+async def boom():
+    raise RuntimeError("Unexpected internal error")
+
+@router.post("/echo")
+async def echo(data: dict):
+    if "password" in data:
+        raise CustomExceptionA("Test mask logging")
+    return data
+
